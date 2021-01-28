@@ -192,7 +192,7 @@ int I2C_24LC1025::_WriteBlock(uint32_t memoryAddress, const uint8_t* buffer, con
   _lastWrite = micros();
   if (rv != 0)
   {
-    if (debug)
+    if (_debug)
     {
       Serial.print("mem addr w: ");
       Serial.print(memoryAddress, HEX);
@@ -213,10 +213,13 @@ int I2C_24LC1025::_ReadBlock(uint32_t memoryAddress, uint8_t* buffer, const uint
   int rv = _wire->endTransmission();
   if (rv != 0)
   {
-    Serial.print("mem addr r: ");
-    Serial.print(memoryAddress, HEX);
-    Serial.print("\t");
-    Serial.println(rv);
+    if (_debug)
+    {
+      Serial.print("mem addr r: ");
+      Serial.print(memoryAddress, HEX);
+      Serial.print("\t");
+      Serial.println(rv);
+    }
     return -(abs(rv));  // error
   }
 

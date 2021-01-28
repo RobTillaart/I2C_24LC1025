@@ -75,6 +75,8 @@ private:
   int       _ReadBlock(uint32_t memoryAddress, uint8_t* buffer, const uint8_t length);
 
   TwoWire * _wire;
+
+  bool      _debug = true;
 };
 
 // -- END OF FILE -- 

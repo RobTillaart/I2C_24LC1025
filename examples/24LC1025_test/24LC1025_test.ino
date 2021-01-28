@@ -34,7 +34,7 @@ void setup()
   Serial.println(ee.readByte(65536));
 
   start = micros();
-  dump(0x00, 0x0FFFF);
+  dump(0x00, 0x0FFFF);  // First block of 64K
   stop = micros();
   Serial.print("\nTIME: \t");
   Serial.println(stop - start);
@@ -54,16 +54,16 @@ void dump(uint32_t from, uint32_t to)
   for (uint32_t i = from; i < to; i++)  // I2C_DEVICESIZE_24LC512
   {
     volatile int x = ee.readByte(i);
-    //    char buffer[24];
-    //    if (i % 16 == 0)
-    //    {
-    //      char buffer[24];
-    //      Serial.print('\n');
-    //      sprintf(buffer, "%08lX\t", i);
-    //      Serial.print(buffer);
-    //    }
-    //    sprintf(buffer, "%02X\t", ee.readByte(i));
-    //    Serial.print(buffer);
+    char buffer[24];
+    if (i % 16 == 0)
+    {
+      char buffer[24];
+      Serial.print('\n');
+      sprintf(buffer, "%08lX\t", i);
+      Serial.print(buffer);
+    }
+    sprintf(buffer, "%02X\t", ee.readByte(i));
+    Serial.print(buffer);
   }
   Serial.println();
 }
