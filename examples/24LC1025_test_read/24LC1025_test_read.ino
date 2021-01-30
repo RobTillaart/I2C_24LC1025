@@ -52,9 +52,9 @@ void setup()
   Serial.println("\nwriting and reading in the high block");
   char buf3[24] = "aabbccddeeffgghhiijj";
   char buf4[24];
-  ee.writeBlock(0x10000 + 120, (uint8_t*) buf3, strlen(buf3) + 1);
+  ee.writeBlock(0x10000 + 120, (uint8_t*) buf3, (uint32_t)strlen(buf3) + 1);
   dump(0x10000 + 96, 0x10000 + 160);
-  ee.readBlock(0x10000 + 120, (uint8_t*) buf4, strlen(buf3) + 1);
+  ee.readBlock(0x10000 + 120, (uint8_t*) buf4, (uint32_t)strlen(buf3) + 1);
   buf4[20] = 0;
   Serial.println(buf4);
 
@@ -66,31 +66,31 @@ void setup()
 
 
   Serial.println("\nwriting over block boundary block");
-  ee.writeBlock(0xFFF0, "012345678901234567890123456789012345", 32);
+  ee.writeBlock(0xFFF0, (uint8_t *) "012345678901234567890123456789012345", (uint32_t) 32);
   dump(0xFFE0, 0x10020);
 
   char buf5[64];
-  ee.readBlock(0xFFF0, buf5, 32);
+  ee.readBlock(0xFFF0, (uint8_t *)buf5, (uint32_t)32);
   buf5[32] = 0;
   Serial.println(buf5);
 
   Serial.println("\nreadBlock timing 64 bytes");
   start = micros();
-  ee.readBlock(0x0000, buf5, 32);
+  ee.readBlock(0x0000, (uint8_t *)buf5, (uint32_t)32);
   stop = micros();
   Serial.print("TIME: \t");
   Serial.println(stop - start);
   delay(10);
 
   start = micros();
-  ee.readBlock(0xFFF0, buf5, 32);
+  ee.readBlock(0xFFF0, (uint8_t *)buf5, (uint32_t)32);
   stop = micros();
   Serial.print("TIME: \t");
   Serial.println(stop - start);
   delay(10);
 
   start = micros();
-  ee.readBlock(0x1F0000, buf5, 32);
+  ee.readBlock(0x1F0000, (uint8_t *)buf5, (uint32_t)32);
   stop = micros();
   Serial.print("TIME: \t");
   Serial.println(stop - start);
@@ -119,7 +119,6 @@ void dump(uint32_t from, uint32_t to)
 {
   for (uint32_t i = from; i < to; i++)  // I2C_DEVICESIZE_24LC512
   {
-    volatile int x = ee.readByte(i);
     char buffer[24];
     if (i % 16 == 0)
     {
