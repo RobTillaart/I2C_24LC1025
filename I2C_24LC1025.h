@@ -2,7 +2,7 @@
 //
 //    FILE: I2C_24LC1025.h
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.1.1
+// VERSION: 0.1.2
 // PURPOSE: I2C_24LC1025 library for Arduino with EEPROM 24FC1025 et al.
 // HISTORY: See I2C_24LC1025.cpp
 //     URL: https://github.com/RobTillaart/I2C_24LC1025
@@ -12,7 +12,8 @@
 #include "Wire.h"
 
 
-#define I2C_24LC1025_VERSION        (F("0.1.0"))
+#define I2C_24LC1025_VERSION        (F("0.1.2"))
+
 
 #define I2C_DEVICESIZE_24LC512      131072
 #define I2C_24LC1025_PAGESIZE       128
@@ -28,12 +29,12 @@ class I2C_24LC1025
 {
 public:
 
-  I2C_24LC1025(uint8_t deviceAddress);
+  I2C_24LC1025(uint8_t deviceAddress, TwoWire *wire = &Wire);
 
 #if defined (ESP8266) || defined(ESP32)
-  bool      begin(uint8_t sda, uint8_t scl, TwoWire *wire = &Wire);
+  bool      begin(uint8_t sda, uint8_t scl);
 #endif
-  bool      begin(TwoWire *wire = &Wire);
+  bool      begin();
   bool      isConnected();
 
 
@@ -57,6 +58,7 @@ public:
 
   uint32_t getDeviceSize() { return _deviceSize; };
   uint8_t  getPageSize()   { return _pageSize; };
+  uint32_t getLastWrite()  { return _lastWrite; };
 
 
 private:
