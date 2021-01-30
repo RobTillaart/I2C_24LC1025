@@ -1,12 +1,13 @@
 //
 //    FILE: I2C_24LC1025.cpp
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.1.1
+// VERSION: 0.1.2
 // PURPOSE: I2C_24LC1025 library for Arduino with EEPROM I2C_24LC1025 et al.
 //
 //  HISTORY:
 //  0.1.0   2019-12-11  initial version (not tested)
 //  0.1.1   2021-01-20  major redo 
+//  0.1.2   2021-01-31  fix reading over 64K block border
 
 
 #include "I2C_24LC1025.h"
@@ -23,18 +24,18 @@
 //
 // PUBLIC FUNCTIONS
 //
-I2C_24LC1025::I2C_24LC1025(uint8_t deviceAddress )
+I2C_24LC1025::I2C_24LC1025(uint8_t deviceAddress, TwoWire * wire)
 {
   _deviceAddress = deviceAddress;
   _deviceSize = I2C_DEVICESIZE_24LC512;
   _pageSize = I2C_24LC1025_PAGESIZE;
+  _wire = wire;
 }
 
 
 #if defined (ESP8266) || defined(ESP32)
-bool I2C_24LC1025::begin(uint8_t sda, uint8_t scl, TwoWire * wire)
+bool I2C_24LC1025::begin(uint8_t sda, uint8_t scl)
 {
-  _wire = wire;
   if ((sda < 255) && (scl < 255))
   {
     _wire->begin(sda, scl);
@@ -49,9 +50,8 @@ bool I2C_24LC1025::begin(uint8_t sda, uint8_t scl, TwoWire * wire)
 #endif
 
 
-bool I2C_24LC1025::begin(TwoWire * wire)
+bool I2C_24LC1025::begin()
 {
-  _wire = wire;
   _wire->begin();
   _lastWrite = 0;
   return isConnected();
@@ -104,6 +104,15 @@ uint32_t I2C_24LC1025::readBlock(const uint32_t memoryAddress, uint8_t* buffer, 
   uint32_t addr = memoryAddress;
   uint32_t len = length;
   uint32_t rv = 0;
+
+  if ((addr < 0x10000) && ((addr + len) > 0x10000))
+  {
+    uint32_t sublen = 0x10000 - addr;
+    rv = readBlock(addr, (uint8_t *) buffer, sublen);
+    rv += readBlock(0x10000, (uint8_t *) &buffer[sublen], len - sublen);
+    return rv;
+  }
+
   while (len > 0)
   {
     uint8_t cnt = I2C_TWIBUFFERSIZE;
@@ -160,7 +169,7 @@ void I2C_24LC1025::_beginTransmission(uint32_t memoryAddress)
 {
   // chapter 5+6 - datasheet - need three bytes for address
   _actualAddress = _deviceAddress;
-  if (memoryAddress > 65535UL) _actualAddress |= 0x04;  // addresbit 16
+  if (memoryAddress >= 0x10000) _actualAddress |= 0x04;  // addresbit 16
 
 #define I2C_WRITEDELAY  5000
 
@@ -209,6 +218,8 @@ int I2C_24LC1025::_WriteBlock(uint32_t memoryAddress, const uint8_t* buffer, con
 // returns bytes read
 int I2C_24LC1025::_ReadBlock(uint32_t memoryAddress, uint8_t* buffer, const uint8_t length)
 {
+  yield();
+
   this->_beginTransmission(memoryAddress);
   int rv = _wire->endTransmission();
   if (rv != 0)
