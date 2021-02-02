@@ -74,7 +74,7 @@ void setup()
   buf5[32] = 0;
   Serial.println(buf5);
 
-  Serial.println("\nreadBlock timing 64 bytes");
+  Serial.println("\nreadBlock timing 32 bytes");
   start = micros();
   ee.readBlock(0x0000, (uint8_t *)buf5, (uint32_t)32);
   stop = micros();
@@ -124,7 +124,8 @@ void dump(uint32_t from, uint32_t to)
     {
       char buffer[24];
       Serial.print('\n');
-      sprintf(buffer, "%08lX\t", i);
+      // sprintf(buffer, "%08X\t", i);  // ESP cast (long unsigned int)
+      sprintf(buffer, "%08lX\t", i);  // AVR needs lX
       Serial.print(buffer);
     }
     sprintf(buffer, "%02X\t", ee.readByte(i));

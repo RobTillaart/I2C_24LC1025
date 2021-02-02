@@ -2,7 +2,7 @@
 //
 //    FILE: I2C_24LC1025.h
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.1.2
+// VERSION: 0.1.3
 // PURPOSE: I2C_24LC1025 library for Arduino with EEPROM 24FC1025 et al.
 // HISTORY: See I2C_24LC1025.cpp
 //     URL: https://github.com/RobTillaart/I2C_24LC1025
@@ -12,17 +12,11 @@
 #include "Wire.h"
 
 
-#define I2C_24LC1025_VERSION        (F("0.1.2"))
+#define I2C_24LC1025_VERSION        (F("0.1.3"))
 
 
 #define I2C_DEVICESIZE_24LC512      131072
 #define I2C_24LC1025_PAGESIZE       128
-
-
-// TWI buffer needs max 2 bytes for eeprom address
-// 1 byte for eeprom register address is available in txbuffer
-
-#define I2C_TWIBUFFERSIZE           30
 
 
 class I2C_24LC1025
@@ -54,6 +48,10 @@ public:
   // updates a byte at memory address, writes only if there is a new value.
   // return 0 if data is same or written OK, error code otherwise.
   int      updateByte(const uint32_t memoryAddress, const uint8_t value);
+  // updates a block in memory, writes only if there is a new value.
+  // only to be used when you expect to write same buffer multiple times. 
+  // test your performance gains!
+  int      updateBlock(const uint32_t memoryAddress, const uint8_t* buffer, const uint32_t length);
 
 
   uint32_t getDeviceSize() { return _deviceSize; };
@@ -81,6 +79,4 @@ private:
   bool      _debug = true;
 };
 
-// -- END OF FILE -- 
-
-
+// -- END OF FILE --

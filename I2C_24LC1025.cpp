@@ -1,13 +1,14 @@
 //
 //    FILE: I2C_24LC1025.cpp
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.1.2
+// VERSION: 0.1.3
 // PURPOSE: I2C_24LC1025 library for Arduino with EEPROM I2C_24LC1025 et al.
 //
 //  HISTORY:
 //  0.1.0   2019-12-11  initial version (not tested)
 //  0.1.1   2021-01-20  major redo 
 //  0.1.2   2021-01-31  fix reading over 64K block border
+//  0.1.3   2021-02-02  add updateBlock();
 
 
 #include "I2C_24LC1025.h"
@@ -15,9 +16,11 @@
 
 //  TWI buffer needs max 2 bytes for eeprom address
 //  1 byte for eeprom register address is available in txbuffer
-//  NOTE this is typical on an UNO.
-//  TODO investigate
-#define I2C_TWIBUFFERSIZE           30
+#if defined(ESP32) || defined(ESP8266)
+#define I2C_BUFFERSIZE           128
+#else
+#define I2C_BUFFERSIZE           30   //  AVR, STM 
+#endif
 
 
 ////////////////////////////////////////////////////////////////////
@@ -74,8 +77,8 @@ int I2C_24LC1025::writeByte(const uint32_t memoryAddress, const uint8_t value)
 
 int I2C_24LC1025::setBlock(const uint32_t memoryAddress, const uint8_t data, const uint32_t length)
 {
-  uint8_t buffer[I2C_TWIBUFFERSIZE];
-  for (uint8_t i = 0; i < I2C_TWIBUFFERSIZE; i++)
+  uint8_t buffer[I2C_BUFFERSIZE];
+  for (uint8_t i = 0; i < I2C_BUFFERSIZE; i++)
   {
     buffer[i] = data;
   }
@@ -115,7 +118,7 @@ uint32_t I2C_24LC1025::readBlock(const uint32_t memoryAddress, uint8_t* buffer, 
 
   while (len > 0)
   {
-    uint8_t cnt = I2C_TWIBUFFERSIZE;
+    uint8_t cnt = I2C_BUFFERSIZE;
     if (cnt > len) cnt = len;
     rv     += _ReadBlock(addr, buffer, cnt);
     addr   += cnt;
@@ -134,6 +137,32 @@ int I2C_24LC1025::updateByte(const uint32_t memoryAddress, const uint8_t data)
 }
 
 
+int I2C_24LC1025::updateBlock(const uint32_t memoryAddress, const uint8_t* buffer, const uint32_t length)
+{
+  uint32_t addr = memoryAddress;
+  uint32_t len = length;
+  uint32_t rv = 0;
+  while (len > 0)
+  {
+    uint8_t buf[I2C_BUFFERSIZE];
+    uint8_t cnt = I2C_BUFFERSIZE;
+    
+    if (cnt > len) cnt = len;
+    rv     += _ReadBlock(addr, buf, cnt);
+    if (memcmp(buffer, buf, cnt) != 0)
+    {
+      _pageBlock(addr, buffer, cnt, true);
+    }
+    addr   += cnt;
+    buffer += cnt;
+    len    -= cnt;
+    yield();    // For OS scheduling etc
+  }
+  return rv;
+}
+
+
+
 ////////////////////////////////////////////////////////////////////
 //
 // PRIVATE
@@ -150,7 +179,7 @@ int I2C_24LC1025::_pageBlock(uint32_t memoryAddress, const uint8_t * buffer, con
   {
     uint8_t bytesUntilPageBoundary = this->_pageSize - addr % this->_pageSize;
 
-    uint8_t cnt = I2C_TWIBUFFERSIZE;
+    uint8_t cnt = I2C_BUFFERSIZE;
     if (cnt > len) cnt = len;
     if (cnt > bytesUntilPageBoundary) cnt = bytesUntilPageBoundary;
 
@@ -189,7 +218,7 @@ void I2C_24LC1025::_beginTransmission(uint32_t memoryAddress)
 }
 
 
-// pre: length <= this->_pageSize  && length <= I2C_TWIBUFFERSIZE;
+// pre: length <= this->_pageSize  && length <= I2C_BUFFERSIZE;
 // returns 0 = OK otherwise error
 int I2C_24LC1025::_WriteBlock(uint32_t memoryAddress, const uint8_t* buffer, const uint8_t length)
 {
