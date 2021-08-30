@@ -6,15 +6,15 @@
 [![GitHub release](https://img.shields.io/github/release/RobTillaart/I2C_24LC1025.svg?maxAge=3600)](https://github.com/RobTillaart/I2C_24LC1025/releases)
 
 
-# I2C_24FC1025 - I2C 1MB EEPROM
+# I2C_24LC1025 - I2C 1MB EEPROM
 
-Arduino library for for external I2C EEPROM - 24LC1025 and equivalents.
+Arduino library for for external I2C EEPROM - 24LC1025 and equivalents e.g. 24AA1025/24FC1025
 
 
 ## Description
 
 This library is to access external I2C EEPROM of 128 KB in size, 
-typically the 24LC1025 and equivalents.
+typically the 24LC1025 and equivalents e.g. 24AA1025/24FC1025.
 
 **Warning**
 A2 = Non-Configurable Chip Select.
