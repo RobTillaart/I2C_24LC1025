@@ -289,9 +289,12 @@ void I2C_24LC1025::_beginTransmission(uint32_t memoryAddress)
 
 #define I2C_WRITEDELAY  5000
 
-  // Wait until EEPROM gives ACK again.
-  // this is a bit faster than the hardcoded 5 milliSeconds  // chapter 7 
-  while ( (micros() - _lastWrite) <= I2C_WRITEDELAY )
+
+  //  Wait until EEPROM gives ACK again.
+  //  this is a bit faster than the hardcoded 5 milliSeconds  // chapter 7 
+  //  TWR = WriteCycleTime
+  uint32_t waitTime = I2C_WRITEDELAY + _extraTWR * 1000UL;  // do the math once.
+  while ((micros() - _lastWrite) <= waitTime)
   {
     _wire->beginTransmission(_actualAddress);
     if (_wire->endTransmission() == 0) break;
@@ -300,9 +303,9 @@ void I2C_24LC1025::_beginTransmission(uint32_t memoryAddress)
   }
 
    uint16_t memAddr = (memoryAddress & 0xFFFF);
-  _wire->beginTransmission(_actualAddress);      // device address + bit 16
-  _wire->write((memAddr >> 8) & 0xFF);   // highByte
-  _wire->write(memAddr & 0xFF);          // lowByte
+  _wire->beginTransmission(_actualAddress);    // device address + bit 16
+  _wire->write((memAddr >> 8) & 0xFF);         // highByte
+  _wire->write(memAddr & 0xFF);                // lowByte
 }
 
 
@@ -315,20 +318,21 @@ int I2C_24LC1025::_WriteBlock(uint32_t memoryAddress, const uint8_t * buffer, co
   this->_beginTransmission(memoryAddress);
   _wire->write(buffer, length);
   int rv = _wire->endTransmission();
+  _lastWrite = micros();
+
   yield();
 
-  _lastWrite = micros();
-  if (rv != 0)
-  {
-    if (_debug)
-    {
-      Serial.print("mem addr w: ");
-      Serial.print(memoryAddress, HEX);
-      Serial.print("\t");
-      Serial.println(rv);
-    }
-    return -(abs(rv));  // error
-  }
+//  if (rv != 0)
+//  {
+//    if (_debug)
+//    {
+//      Serial.print("mem addr w: ");
+//      Serial.print(memoryAddress, HEX);
+//      Serial.print("\t");
+//      Serial.println(rv);
+//    }
+//    return -(abs(rv));  // error
+//  }
   return rv;
 }
 
@@ -337,19 +341,20 @@ int I2C_24LC1025::_WriteBlock(uint32_t memoryAddress, const uint8_t * buffer, co
 //  returns bytes read
 uint8_t I2C_24LC1025::_ReadBlock(uint32_t memoryAddress, uint8_t * buffer, const uint8_t length)
 {
-  yield();
+  _waitEEReady();
+
   //  _beginTransmissinon sets actual address !!!
   this->_beginTransmission(memoryAddress);
   int rv = _wire->endTransmission();
   if (rv != 0)
   {
-    if (_debug)
-    {
-      Serial.print("mem addr r: ");
-      Serial.print(memoryAddress, HEX);
-      Serial.print("\t");
-      Serial.println(rv);
-    }
+//    if (_debug)
+//    {
+//      Serial.print("mem addr r: ");
+//      Serial.print(memoryAddress, HEX);
+//      Serial.print("\t");
+//      Serial.println(rv);
+//    }
     return 0;  // error
   }
 
@@ -374,7 +379,9 @@ void I2C_24LC1025::_waitEEReady()
   uint32_t waitTime = I2C_WRITEDELAY + _extraTWR * 1000UL;  // do the math once.
   while ((micros() - _lastWrite) <= waitTime)
   {
-    if (isConnected()) return;
+    _wire->beginTransmission(_deviceAddress);
+    int x = _wire->endTransmission();
+    if (x == 0) return;
     yield();
   }
   return;
