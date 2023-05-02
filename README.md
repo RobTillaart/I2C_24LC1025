@@ -22,7 +22,16 @@ This pin must be connected to VCC (+5V).
 The device will **NOT** work when this pin floats or is connected to GND (0V).
 
 
+#### Links
+
+- https://github.com/RobTillaart/I2C_EEPROM
+
+
 ## Interface
+
+```cpp
+#include "I2C_eeprom.h"
+```
 
 The interface is kept quite identical to the I2C_EEPROM library.
 https://github.com/RobTillaart/I2C_EEPROM
