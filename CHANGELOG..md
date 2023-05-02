@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.2.3] - 2023-05-02
 - improve support for RP2040
 - move code from .h to .cpp
+- update readme.md
 - minor edits
 
 

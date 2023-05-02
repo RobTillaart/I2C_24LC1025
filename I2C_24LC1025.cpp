@@ -4,8 +4,6 @@
 // VERSION: 0.2.3
 // PURPOSE: I2C_24LC1025 library for Arduino with EEPROM I2C_24LC1025 et al.
 //     URL: https://github.com/RobTillaart/I2C_24LC1025
-//
-// HISTORY: See changelog.md
 
 
 #include "I2C_24LC1025.h"
