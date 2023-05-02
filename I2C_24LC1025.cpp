@@ -51,7 +51,7 @@ bool I2C_24LC1025::begin(uint8_t sda, uint8_t scl)
 
 
 #if defined(PICO_RP2040)
-bool I2C_eeprom::begin(uint8_t sda, uint8_t scl)
+bool I2C_24LC1025::begin(uint8_t sda, uint8_t scl)
 {
   if ((sda < 255) && (scl < 255))
   {
