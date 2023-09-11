@@ -203,3 +203,12 @@ See examples
 - See I2C EEPROM as this library is following.
 - add examples
 
+
+## Support
+
+If you appreciate my libraries, you can support the development and maintenance.
+Improve the quality of the libraries by providing issues and Pull Requests, or
+donate through PayPal or GitHub sponsors.
+
+Thank you,
+
