@@ -38,7 +38,7 @@
 
 unittest_setup()
 {
-  fprintf(stderr, "I2C_24LC1025_VERSION: %s\n", (char *) I2C_24LC1025_VERSION);
+  fprintf(stderr, "I2C_24LC1025_LIB_VERSION: %s\n", (char *) I2C_24LC1025_LIB_VERSION);
 }
 
 unittest_teardown()
@@ -66,4 +66,6 @@ unittest(test_constructor)
 
 unittest_main()
 
-// --------
+
+//  -- END OF FILE --
+
