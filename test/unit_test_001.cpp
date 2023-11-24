@@ -58,6 +58,8 @@ unittest(test_constructor)
   Wire.resetMocks();
 
   I2C_24LC1025 EE(0x50);
+
+  Wire.begin();
   assertTrue(EE.begin());
 
   assertEqual(1, 1);
