@@ -105,7 +105,7 @@ Returns true if deviceAddress is found on the bus, false otherwise.
 Optionally one can set the **WP** writeProtect pin. (see section below).
 If the **WP** pin is defined, the default behaviour will be to **not** allow writing.
 - **bool isConnected()** test to see if deviceAddress is found on the bus.
-- **uint8_t getAddress()** returns deviceAddress set in constructor.
+- **uint8_t getAddress()** returns deviceAddress set in the constructor.
 
 
 ### Write functions
