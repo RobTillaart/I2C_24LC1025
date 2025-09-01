@@ -16,8 +16,8 @@ Arduino library for 24LC1025 (1 Mbit) I2C EEPROM and equivalents e.g. 24AA1025/2
 
 ## Description
 
-This library is to access the external I2C EEPROM of 128 KB in size, 
-typically the 24LC1025 and equivalents e.g. 24AA1025/24FC1025.
+This library is to access the external I2C EEPROM of 128 KB = 1 Mbit in size.
+Typically the 24LC1025 and equivalents e.g. 24AA1025/24FC1025.
 
 The user is responsible to verify the used memoryAddress (range) exists in the used EEPROM. 
 (read / write / verify functions).
@@ -30,6 +30,8 @@ This pin must be connected to VCC (+5V).
 The device will **NOT** work when this pin floats or is connected to GND (0V).
 
 This library follows the I2C_EEPROM library, see links below.
+
+Feedback, as always, is welcome.
 
 
 ### Breaking change
@@ -103,8 +105,8 @@ Most important difference is 32 bit memory addresses.
 
 ### Constructor
 
-- **I2C_24LC1025(uint8_t deviceAddress, TwoWire \*wire = &Wire)** constructor, to set the 
-device address and optional Wire interface.
+- **I2C_24LC1025(uint8_t deviceAddress, TwoWire \*wire = &Wire)** constructor,
+to set the device address and optional Wire interface.
 The address = 0x50, 0x51, 0x52, 0x53 depending on A1 and A2 address lines, see above.
 - **bool begin(uint8_t writeProtectPin = -1)** Optionally one can set the **WP**
 writeProtect pin. (see section below).
@@ -237,6 +239,7 @@ The library does not offer multiple EEPROMS as one continuous storage device.
 
 - See I2C EEPROM as this library is following.
 - add examples
+- sync _pageSize with I2C_CAT24M01
 
 
 ## Support
