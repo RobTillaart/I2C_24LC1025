@@ -1,7 +1,7 @@
 //
 //    FILE: I2C_24LC1025.cpp
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.3.2
+// VERSION: 0.3.3
 // PURPOSE: I2C_24LC1025 library for Arduino with EEPROM I2C_24LC1025 et al.
 //     URL: https://github.com/RobTillaart/I2C_24LC1025
 
@@ -37,6 +37,7 @@ bool I2C_24LC1025::begin(int8_t writeProtectPin)
   _writeProtectPin = writeProtectPin;
   if (_writeProtectPin >= 0)
   {
+    _autoWriteProtect = EN_AUTO_WRITE_PROTECT;
     pinMode(_writeProtectPin, OUTPUT);
     preventWrite();
   }
